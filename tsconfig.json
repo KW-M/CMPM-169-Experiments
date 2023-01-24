@@ -1,0 +1,20 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "outDir": "./built",
+        "allowJs": true,
+        "target": "es5",
+        "allowUnreachableCode": false,
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        "outFile": "./built/combined.js"
+    },
+    "include": [
+        "./**/*"
+    ],
+    "exclude": [
+        "./plugins/**/*",
+        "./typings/**/*",
+        "./built/**/*" // This is what fixed it!
+    ]
+}

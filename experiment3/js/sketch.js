@@ -32,7 +32,7 @@ function setup() {
     let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
     canvas.parent("canvas-container");
     // resize canvas is the page is resized
-    $(window).resize(function() {
+    $(window).on("resize", function () {
         console.log("Resizing...");
         resizeCanvas(canvasContainer.width(), canvasContainer.height());
     });
@@ -45,7 +45,7 @@ function setup() {
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
-    background(220);    
+    background(220);
     // call a method on the instance
     myInstance.myMethod();
 
