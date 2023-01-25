@@ -75,7 +75,7 @@ vec4 poly(float x, float y, float size, float sides, float rotation, vec3 col){
 
 void main() {
 
-    float mouseCenterProximity = abs(mousex - 0.5) + abs(mousey - 0.5);
+    float mouseCenterProximity = abs((mousedown *1.5) - (abs(mousex - 0.5) + abs(mousey - 0.5)));
 
     // Load the video texture:
     vec2 uv = vTexCoord;
