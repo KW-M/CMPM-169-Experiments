@@ -23,7 +23,7 @@ uniform vec2 resolution;
 uniform float time;
 uniform float mousex;
 uniform float mousey;
-uniform bool mousedown;
+uniform float mousedown;
 
 
 // grab texcoords from vert shader
@@ -98,21 +98,25 @@ void main() {
 
 
 
-    // if mousedown:
-    if (mousedown == true) {
-    // tex += float(mousedown) * (-tex1 - tex2);
-    // tex *= float(mousedown) * 2.0 + 1.0;
-        tex -= tex1;
-        tex -= tex2;
-        tex *= 3.0;
-        mouseCenterProximity *= -1.0;
-        mouseCenterProximity += 1.0;
-    } else {
-        tex = tex + tex1 * 2.0 + tex2 * 2.0;
-        tex *= 1.0 / 3.0;
-    }
+    // IF mousedown:
+    tex += mousedown * (-tex1 - tex2);
+    tex *= mousedown * 1.0 + 1.0;
 
+    // ELSE:
+    tex += (1.0 - mousedown) * (tex1 * 2.0 + tex2 * 2.0);
+    tex /= (1.0 - mousedown) * 2.0 + 1.0;
 
+    tex *= 1.5;
+
+    //     tex -= tex1;
+    //     tex -= tex2;
+    //     tex *= 3.0;
+    //     mouseCenterProximity *= -1.0;
+    //     mouseCenterProximity += 1.0;
+    // } else {
+    //     tex = tex + tex1 * 2.0 + tex2 * 2.0;
+    //     tex *= 1.0 / 3.0;
+    // }
 
 
     vec2 center = resolution * 1.0; // draw the shape at the center of the screen

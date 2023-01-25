@@ -13,6 +13,7 @@ let canvasContainer;
 let theShader;
 let fingersVideo;
 let cam;
+let camReady = false;
 
 let mousePress = false;
 
@@ -23,35 +24,43 @@ function preload() {
 
 // setup() function is called once when the program starts
 function setup() {
-    // place our canvas, making it fit our container
     canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height(), WEBGL);
-    canvas.parent("canvas-container");
-
 
     // video source
     // fingersVideo = createVideo(['assets/fingers.mov', 'assets/fingers.webm']);
     // fingersVideo.loop();
 
     // camera source
-    cam = createCapture(VIDEO);
+    cam = createCapture(VIDEO, () => { console.log(camReady); camReady = true });
     cam.size(canvasContainer.width() / 2, canvasContainer.height() / 2);
     cam.hide();
+
+    canvasContainer.html("<h2>Allow camera to see demo 📹</h2>")
+
+    let i_id = setInterval(() => {
+        if (!camReady) return;
+        clearInterval(i_id)
+        $("#canvas-container>h2").remove();
+    }, 10)
+
+    // place our canvas, making it fit our container
+    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height(), WEBGL);
+    canvas.parent("canvas-container");
 
     // resize canvas is the page is resized
     $(window).on("resize", function () {
         console.log("Resizing...");
         resizeCanvas(canvasContainer.width(), canvasContainer.height());
     });
-
-
-
 }
 
-
+let mousePressTransition = 0;
 function draw() {
     // shader() sets the active shader with our shader
     shader(theShader);
+
+    // rect gives us some geometry on the screen
+    rect(0, 0, width, height);
 
     let mouseXNorm = map(mouseX, 0, width, 0, 1);
     let mouseYNorm = map(mouseY, 0, height, 0, 1)
@@ -60,19 +69,20 @@ function draw() {
     theShader.setUniform('resolution', [width, height]);
     theShader.setUniform('mousex', mouseXNorm);
     theShader.setUniform('mousey', mouseYNorm);
-    theShader.setUniform('mousedown', mousePress);
+    theShader.setUniform('mousedown', mousePressTransition);
     theShader.setUniform('time', frameCount * 0.01);
     theShader.setUniform('tex0', cam);
 
-    // rect gives us some geometry on the screen
-    rect(0, 0, 10, 10);
+    mousePressTransition = constrain(mousePressTransition + (mousePress ? 0.01 : -0.01), 0, 1)
 
-    resetShader()
 
-    stroke(255, 0, 0, 1)
-    strokeWeight(5)
-    fill(1, 1, 1, 1)
-    circle(mouseX - canvasContainer.width() / 2, mouseY - canvasContainer.height() / 2, 30)
+
+    // resetShader()
+
+    // stroke(255, 0, 0, 1)
+    // strokeWeight(5)
+    // fill(1, 1, 1, 1)
+    // circle(mouseX - canvasContainer.width() / 2, mouseY - canvasContainer.height() / 2, 30)
 }
 
 
