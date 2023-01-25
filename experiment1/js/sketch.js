@@ -57,7 +57,7 @@ let size;
 let frameNum = 0;
 
 function draw() {
-    frameNum++;
+    frameNum += 3;
     clear();
     background(0);
     points = points.slice(0, 100);
@@ -75,7 +75,9 @@ function draw() {
     for (let i = 0; i < points.length - 1; i++) {
         line(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
         push();
+        translate(width / 2, height / 2)
         rotate(max((i + frameNum * 0.0001) * (cos(frameNum * 0.001) + 0.99) * 0.001, 0));
+        translate(-width / 2, -height / 2)
         stroke(random(0, i % 256), random(0, -i % 256 + 256), random(0, 256));
     }
     pop();
