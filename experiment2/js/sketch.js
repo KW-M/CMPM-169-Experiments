@@ -73,16 +73,7 @@ function draw() {
     theShader.setUniform('time', frameCount * 0.01);
     theShader.setUniform('tex0', cam);
 
-    mousePressTransition = constrain(mousePressTransition + (mousePress ? 0.01 : -0.01), 0, 1)
-
-
-
-    // resetShader()
-
-    // stroke(255, 0, 0, 1)
-    // strokeWeight(5)
-    // fill(1, 1, 1, 1)
-    // circle(mouseX - canvasContainer.width() / 2, mouseY - canvasContainer.height() / 2, 30)
+    mousePressTransition = constrain(mousePressTransition + (mousePress ? 0.08 : -0.01), 0, 1)
 }
 
 
