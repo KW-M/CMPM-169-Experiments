@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<!-- This title is used for tabs and bookmarks -->
-	<title>Experiment X - Subject/Topic</title>
+	<title>Experiment 2 - Video, Vectors and Interactivity</title>
 
 	<!-- Use UTF character set, a good idea with any webpage -->
 	<meta charset="UTF-8" />
@@ -16,57 +17,69 @@
 	<!-- Load jQuery library -->
 	<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
 	<!-- Load p5.js library -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/p5.js"></script>
+	<script src="./js/p5.min.js"></script>
+	<script src="./js/p5.sound.min.js"></script>
+	<script src="./js/fourier.js"></script>
 
 	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
-	<!-- Use me for a JavaScript OOP Project -->
-	<script type="text/javascript" src="./js/project.js" DEFER></script>
 	<!-- Use me for a p5.js project -->
 	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
 </head>
+
 <body>
 	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+	<div id="canvas-container">
+		<!-- canvas will be added here -->
+	</div>
 	<main id="content">
 		<section>
-			<h1>Experiment X - Subject/Topic</h1>
+			<h1>Experiment 2 - Video, Vectors and Interactivity</h1>
 			<div class="minor-section">
 				<h2>Imitate</h2>
-				<p>To develop artistic creativity in coding, it can be helpful to start by studying and learning from existing examples. This might involve reviewing code written by others, analyzing successful techniques, or even copying and modifying code to better understand how it works. By imitating and learning from existing techniques and strategies, we can gain a better understanding of what has been done before and what is possible, and identify opportunities for improvement and innovation.</p>
-				<p>What code did you start with? (You don't need to provide the code itself, but where did you start?) Document this step briefly.</p>
+				<p>I began my search with the rotating shape shader p5js example <a
+						href="https://editor.p5js.org/KW-M/sketches/wdNXkzrkP">found here</a>. That showed how to setup
+					a webgl shader context in p5 and create n-sided polygons in GLSL. Then I used the examples from <a
+						href="https://editor.p5js.org/p5/sketches/Dom:_Video_Pixels">video pixels</a> and <a
+						href="https://p5js.org/examples/3d-shader-using-webcam.html">webcam</a> to get the webcam video
+					feed into the shader. </p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Integrate</h2>
-				<p>After learning from existing techniques and strategies, we can build upon that foundation by combining elements from different sources. This might involve combining elements from different programming languages, using libraries or frameworks in new ways, or bringing together techniques from different fields or disciplines. By integrating and combining elements from different sources, we can create something new and unique.</p>
-				<p>How did you extend the code or combine with another technique to make something new? Document this step.</p>
+				<p> By Tying the shape to the movement and press of the mouse I got the shape to feel more alive /
+					interesting. I used the alpha channel of the shape to layer, crop and invert the video in
+					interesting ways.</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Innovate</h2>
-				<p>Finally, we can introduce new or original ideas to our coding process by thinking creatively and pushing the boundaries. This might involve developing entirely new techniques or approaches, or using existing techniques in new and creative ways. By innovating and introducing new ideas, we can create art that is truly groundbreaking.</p>
-				<p>How did you use the code as a jumping off point to create something truly unique and novel? Document this step thoroughly.</p>
+				<p>The last thing I discovered kindof accidentaly, which is that in Firefox, the colors past the bounds
+					of a webgl texture are just the nearest edge streached into thin lines along x or y. It was fun to
+					play around with, but I wanted to tie it into the mouse control scheme. I took some inspiration from
+					<a href="https://www.justareflektor.com">www.justareflektor.com</a> and I ended up replicating the
+					edge effect by using the x and y "crosshairs" of the mouse position as locations to sample the
+					texture
+					for the full height and width of the canvas. And clicking blends those lines in a subtractive mode
+					with the original video, creating an interesting dark ranbow effect.
+				</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>Each person that worked on the code should reflect on the process, the difficulties, and the successes of the experiment. Here's where you can put your reflections.</p>
-				<ul>
-					<li>What part of the project you contributed</li>
-					<li>A reflection on your work and the work of the team</li>
-					<li>Brief highs and lows</li>
-				</ul>
+				<p>This was a personal project. I found it cool how easy it was to get the webcam in, but hard to think
+					about the math to get the screen space to line up with the canvas and mouse. Also frustratingly,
+					using the canvas with a custom shader and drawing normal p5 js shapes doesn't work. Adding a
+					seperate offscreen graphics element solves this, but brings the framerate way down. I think I'm
+					particularly interested in the GPU shading, despite being harder to think about, because I'm also
+					trying to learn parallel programming this quarter, and I wan't to practice that way of thinking.</p>
 			</div>
 
-			<div class="minor-section">
-				<h2>Results</h2>
-				<div id="canvas-container">
-					<!-- canvas will be added here -->
-				</div>
-			</div>
+
 		</section>
 		<nav id="links">
-			<!-- Put links to other pages (including the homepage) here. -->
+			<a href="../">Home</a>
 		</nav>
 	</main>
 </body>
+
 </html>
