@@ -11,10 +11,14 @@ let START_REGION = { top: 0, bottom: 0, left: 0, right: 0 }
 let START_REGION_SIZE = 100;
 let PARTICLE_COUNT = 2000;
 let PARTICLE_COLORS = [];
+let AVG_COLOR;
 let PARTICLE_SPEED = 10;
 let RANDOM_JITTER = 0.0;
 let NOISESCALE = 0.01;
 let NOISEOFFSET = 3992;
+
+let mouseXTarget = 1;
+let mouseYTarget = 1;
 
 let CENTERX = 0;
 let CENTERY = 0;
@@ -52,26 +56,25 @@ class gridZone {
         return this.gridCells[this.getIndex(x, y)] || [];
     }
 
-    add(index, value) {
-        const cell = this.gridCells[index] || [];
-        cell.push(value);
+    add(index, colorIndex) {
+        const cell = this.gridCells[index] || new Array(PARTICLE_COLORS.length);
+        cell[colorIndex] = (cell[colorIndex] || 0) + 1;
         this.gridCells[index] = cell;
         return index;
     }
 
-    remove(index, value) {
+    remove(index, colorIndex) {
         const cell = this.gridCells[index];
-        if (cell === undefined || cell.length === 0) return index;
-        const valueIndex = cell.indexOf(value);
-        if (valueIndex != -1) { this.gridCells[index].splice(valueIndex, 1); }
+        if (cell === undefined || cell.length === 0 || this.gridCells[index][colorIndex] === undefined) return index;
+        this.gridCells[index][colorIndex]--;
         return index;
     }
 
-    move(index, x, y, value) {
+    move(index, x, y, colorIndex) {
         const newIndex = this.getIndex(x, y)
         if (newIndex === index) return index;
-        this.remove(index, value)
-        this.add(newIndex, value)
+        this.remove(index, colorIndex)
+        this.add(newIndex, colorIndex)
         return newIndex;
     }
 
@@ -113,21 +116,27 @@ class particle {
         return (this.bounds.right - this.bounds.left) * (this.bounds.bottom - this.bounds.top);
     }
 
-    update(timestep) {
+    update(timestep, colorIndex, norm) {
         this.aliveTime += timestep;
         let noiseHere = getNoise(this.x, this.y);
         if (this.x < 0 || this.x > width || this.y < 0 || this.y > height || noiseHere < 0.01 || noiseHere > 0.99) this.reset();
-        let mouseYNorm = mouseY / height;
         let noiseGradientX = noiseHere - getNoise(this.x + 1, this.y);
         let noiseGradientY = noiseHere - getNoise(this.x, this.y + 1);
-        let gradientVector = createVector(noiseGradientX, noiseGradientY).rotate((90 + (mouseYNorm - 0.5) * 20 - (noiseHere - 0.5) * 10) * Math.PI / 180) //(90 + (noiseHere - 0.5) * 100)
-        const JITTER = RANDOM_JITTER * this.aliveTime / (this.getBoundsArea() + 1);
+        let neghborsAreOtherColor = false;
+        let gridZoneColorCounts = gridZones.getValues(this.x, this.y)
+        for (let i = 0; i < gridZoneColorCounts.length; i++) {
+            if (i != colorIndex && gridZoneColorCounts[colorIndex] < gridZoneColorCounts[i]) {
+                neghborsAreOtherColor = true;
+            }
+        }
+        let gradientVector = createVector(noiseGradientX, noiseGradientY).rotate((90 + ((norm - 0.5) * 30 - (noiseHere - 0.5) * 10)) * Math.PI / 180) //(90 + (noiseHere - 0.5) * 100)
+        let JITTER = RANDOM_JITTER * this.aliveTime / (this.getBoundsArea() + 1) + neghborsAreOtherColor ? 5 : 0;
         let velocityX = gradientVector.x * PARTICLE_SPEED + random(JITTER, -JITTER);
         let velocityY = gradientVector.y * PARTICLE_SPEED + random(JITTER, -JITTER);
         this.x += velocityX * timestep;
         this.y += velocityY * timestep;
         this.updateBounds();
-        this.gridZoneIndex = gridZones.move(this.gridZoneIndex, this.x, this.y, this)
+        this.gridZoneIndex = gridZones.move(this.gridZoneIndex, this.x, this.y, colorIndex)
         return noiseHere;
 
     }
@@ -155,13 +164,21 @@ function setup() {
     }; $(window).on("resize", resizeFunc)
     resizeFunc();
 
-    // START_REGION = { top: -height / 2, bottom: height / 2, left: -width / 2, right: width / 2 };
+    // set up color pallet
     PARTICLE_COLORS = [color(200, 10, 90), color(90, 80, 80), color(0, 100, 80), color(0, 110, 200)];
+    AVG_COLOR = [color(0, 0, 0, 1), ...PARTICLE_COLORS].reduce((prev, curr) => {
+        return color(red(prev) + red(curr) / PARTICLE_COLORS.length,
+            green(prev) + green(curr) / PARTICLE_COLORS.length,
+            blue(prev) + blue(curr) / PARTICLE_COLORS.length);
+    })
+
+    // initialize particles
     for (let i = 0; i < PARTICLE_COUNT; i++) {
         particles.push(new particle())
         particles[i].reset();
     }
 
+    // setup grid zones
     gridZones = new gridZone(width, height);
 
 }
@@ -171,34 +188,51 @@ function draw() {
 
     translate(-CENTERX, -CENTERY);
 
+    // draw line from mouse to center:
+    fill(0, 0)
+    stroke(0, 255);
+    // line(mouseX + random(-5, 5), 0, mouseX + random(-5, 5), height);
+    const mouseXNorm = mouseX / width;
+    const mouseYNorm = mouseY / height;
+    mouseXTarget = lerp(mouseXTarget, mouseXNorm, 0.05) + random(-3, 3) / width;
+    mouseYTarget = lerp(mouseYTarget, mouseYNorm, 0.05) + random(-3, 3) / height;
+    line(mouseXTarget * width, 0, mouseXTarget * width, height);
+    line(0, mouseYTarget * height, width, mouseYTarget * height);
+
+    fill(255, 255)
+    let CIRCLE_SIZE = 50
+    circle(0, 0, CIRCLE_SIZE);
+    circle(width, 0, CIRCLE_SIZE);
+    circle(0, height, CIRCLE_SIZE);
+    circle(width, height, CIRCLE_SIZE);
+
+    // circle(CENTERX, CENTERY, 2 * sqrt(sq(mouseX - CENTERX) + sq(mouseY - CENTERY)));
+
+    // DRAW Squares
+    fill(0, 0)
     for (let x = 0; x < Math.ceil(width / GRID_CELL_SIZE); x++) {
         for (let y = 0; y < Math.ceil(height / GRID_CELL_SIZE); y++) {
             const zone = gridZones.getValues(x * GRID_CELL_SIZE + 1, y * GRID_CELL_SIZE + 1)
-            if (zone.length != 0) {
-                fill(255, zone.length)
-            } else {
-                fill(0, 0)
-            }
+            if (zone.length === 0 || (zone[0] < 10 && zone[1] < 10 && zone[2] < 10)) continue; // ignore nearly empty zones
+            stroke(255 - red(AVG_COLOR) + zone[0], 255 + green(AVG_COLOR) + zone[1], 255 + blue(AVG_COLOR) - zone[2], 1)
             rect(x * GRID_CELL_SIZE, y * GRID_CELL_SIZE, GRID_CELL_SIZE, GRID_CELL_SIZE)
         }
     }
 
-    stroke(255, 255)
-    rect(START_REGION.left, START_REGION.top, START_REGION.right - START_REGION.left, START_REGION.bottom - START_REGION.top)
-
+    // draw particles
     stroke(0, 0)
     for (let i = 0; i < PARTICLE_COUNT; i++) {
         fill(PARTICLE_COLORS[i % PARTICLE_COLORS.length])
         // fill(255, 255, 255, 255)
-        particles[i].update(deltaTime)
+        particles[i].update(deltaTime, i % PARTICLE_COLORS.length, mouseYNorm)
         circle(particles[i].x, particles[i].y, 5)
     }
 
-    // fade out gradually
+    // fade scene out gradually
     if (frameCount % 2 === 0) {
         console.log("CENTERX", CENTERX)
         blendMode(SUBTRACT); // Workaround from here: https://stackoverflow.com/questions/6817729/gradual-fading-by-drawing-a-transparent-rectangle-repeatedly
-        fill(255, 3);
+        fill(mouseXNorm * 255, 3);
         rect(0, 0, width, height);
         blendMode(BLEND);
     }

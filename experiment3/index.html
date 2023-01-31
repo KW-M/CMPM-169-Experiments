@@ -3,7 +3,7 @@
 
 <head>
 	<!-- This title is used for tabs and bookmarks -->
-	<title>Experiment 2 - Video, Vectors and Interactivity</title>
+	<title>Experiment 2 - Generative Art</title>
 
 	<!-- Use UTF character set, a good idea with any webpage -->
 	<meta charset="UTF-8" />
@@ -31,45 +31,47 @@
 	</div>
 	<main id="content">
 		<section>
-			<h1>Experiment 2 - Video, Vectors and Interactivity</h1>
+			<h1>Experiment 2 - Generative Art</h1>
 			<div class="minor-section">
 				<h2>Imitate</h2>
-				<p>I began my search with the rotating shape shader p5js example <a
-						href="https://editor.p5js.org/KW-M/sketches/wdNXkzrkP">found here</a>. That showed how to setup
-					a webgl shader context in p5 and create n-sided polygons in GLSL. Then I used the examples from <a
-						href="https://editor.p5js.org/p5/sketches/Dom:_Video_Pixels">video pixels</a> and <a
-						href="https://p5js.org/examples/3d-shader-using-webcam.html">webcam</a> to get the webcam video
-					feed into the shader. </p>
+
+				// Inspired by:
+				// Inspired by:
+				<p>I was inspired by <a href="https://openprocessing.org/sketch/1752310">this</a> open processing
+					example of a flow field as well as <a href="https://openprocessing.org/sketch/1769288">this</a>
+					example of quadtrees. While my implementations ended up completely diffrent than the code examples,
+					the visuals share many similarities. </p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Integrate</h2>
-				<p> By Tying the shape to the movement and press of the mouse I got the shape to feel more alive /
-					interesting. I used the alpha channel of the shape to layer, crop and invert the video in
-					interesting ways.</p>
+				<p> By implementing my flow field using p5 vector roatations I can steer each particle relative to the
+					flow field. Globally tying this to the mouse position changes how the particles react and weather
+					they like to settle in the "hills" or "valleys" or spread farther out. Subrtractively blending a
+					white rect over the screen gives a very computationally cheap fade effect that's also conrolled by
+					the mouse </p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Innovate</h2>
-				<p>The last thing I discovered kindof accidentaly, which is that in Firefox, the colors past the bounds
-					of a webgl texture are just the nearest edge streached into thin lines along x or y. It was fun to
-					play around with, but I wanted to tie it into the mouse control scheme. I took some inspiration from
-					<a href="https://www.justareflektor.com">www.justareflektor.com</a> and I ended up replicating the
-					edge effect by using the x and y "crosshairs" of the mouse position as locations to sample the
-					texture
-					for the full height and width of the canvas. And clicking blends those lines in a subtractive mode
-					with the original video, creating an interesting dark ranbow effect.
+				<p>In my original plan, I wanted to combine the flow field with particle-particle interaction and
+					behavior like in <a href="https://openprocessing.org/sketch/1678056">Ant Colony</a> or <a
+						href="https://openprocessing.org/sketch/1698016">Artificial Life</a> to do this I used a corse
+					grid of cells that act as counters for each color. When a cell contains more colors than a
+					threashold, the particles speed up and redestribute. The end result is subtle, but leads to the
+					patches and rings of color interspersed with other colors as well as the flashes of grid cells that
+					you see.
 				</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>This was a personal project. I found it cool how easy it was to get the webcam in, but hard to think
-					about the math to get the screen space to line up with the canvas and mouse. Also frustratingly,
-					using the canvas with a custom shader and drawing normal p5 js shapes doesn't work. Adding a
-					seperate offscreen graphics element solves this, but brings the framerate way down. I think I'm
-					particularly interested in the GPU shading, despite being harder to think about, because I'm also
-					trying to learn parallel programming this quarter, and I wan't to practice that way of thinking.</p>
+				<p>This was a solo project. I really hoped to get some interesting results by combining flow fields with
+					per particle interaction behavior.
+					getting the flatened grid query system to work well at a high framerate was more difficult than
+					expected, so I didn't have the time to test as many rules for the particle interactions as I would
+					have liked. That said I think the flow field itself came out beautifully.
+				</p>
 			</div>
 
 
