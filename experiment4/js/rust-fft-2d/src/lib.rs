@@ -27,7 +27,8 @@ pub fn greet() {
 pub struct Image {
     width: usize,
     height: usize,
-    pixels: Vec<u8>,
+    input_pixels: Vec<u8>,
+    output_pixels: Vec<u8>,
     pixel_adjustment_weights: Vec<f64>,
     h_hats: Vec<Complex<f64>>,
 }
@@ -38,7 +39,8 @@ impl Image {
         Image {
             width,
             height,
-            pixels: vec![0; width * height],
+            input_pixels: vec![0; width * height],
+            output_pixels: vec![0; width * height],
             pixel_adjustment_weights: vec![1.0; width * height],
             h_hats: vec![Complex::new(0.0, 0.0); width * height],
         }
@@ -52,21 +54,33 @@ impl Image {
         self.height
     }
 
-    pub fn pixels(&self) -> *const u8 {
-        self.pixels.as_ptr()
+    pub fn input_pixels_ptr(&self) -> *const u8 {
+        self.input_pixels.as_ptr()
     }
 
-    pub fn pix_adjustment_weights(&self) -> *const f64 {
+    pub fn output_pixels_ptr(&self) -> *const u8 {
+        self.output_pixels.as_ptr()
+    }
+
+    pub fn pix_adjustment_weight_ptr(&self) -> *const f64 {
         self.pixel_adjustment_weights.as_ptr()
     }
 
     pub fn apply_adjustment_weights(&mut self) {
         let mut i = 0;
         for x in self.h_hats.iter_mut() {
-            *x *= self.pixel_adjustment_weights[i] as f64 + 1.0;
+            let (r, theta) = x.to_polar();
+            // let theta2 = theta * (self.pixel_adjustment_weights[i] as f64 / 25.0);
+            // let r2 = r * (self.pixel_adjustment_weights[i] as f64 / 25.0 + 1.0);
+            let theta2 = 0.0;
+            let r2 =
+                (self.pixel_adjustment_weights[i] / 25500.0 * (self.width * self.height) as f64);
+            // let r2 = (self.width * self.height) as f64 / self.height as f64;
+            *x = Complex::from_polar(r2, r2);
             i += 1;
         }
 
+        // test:
         // for x in self.h_hats.iter_mut() {
         //     *x *= (i as f64 / 300.0).sin() * 0.5 + 1.0;
         //     i += 1;
@@ -76,7 +90,7 @@ impl Image {
     pub fn fft(&mut self) {
         // Convert the image buffer to complex numbers to be able to compute the FFT.
         let mut img_buffer: Vec<Complex<f64>> = self
-            .pixels
+            .input_pixels
             .iter()
             .map(|&pix| Complex::new(pix as f64 / 255.0, 0.0))
             .collect();
@@ -97,7 +111,7 @@ impl Image {
         }
 
         // Convert the complex img_buffer back into a gray image.
-        self.pixels = img_buffer
+        self.output_pixels = img_buffer
             .iter()
             .map(|c| (c.norm().min(1.0) * 255.0) as u8)
             .collect();
@@ -114,7 +128,7 @@ impl Image {
             .reduce(|acc, pix| return if *pix > *acc { pix } else { acc })
             .unwrap()
             .log2();
-        self.pixels = pixels
+        self.output_pixels = pixels
             .iter()
             .map(|&pix| ((pix.log2() / log_max) as f64 * 255.0) as u8)
             .collect();

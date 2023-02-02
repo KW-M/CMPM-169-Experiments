@@ -21,6 +21,7 @@ let the_image;
 let camReady = false;
 let fft;
 let wasmImage;
+let audioGraphic;
 let forierMagImage, forierPhaseImage;
 
 
@@ -172,6 +173,8 @@ function setup() {
 
     wasmImage = create2dfftImage(the_image.width, the_image.height, getGrayscalePixels(the_image));
     canvasContainer = $("#canvas-container");
+    audioGraphic = createGraphics(the_image.width, the_image.height, WEBGL);
+    // audioGraphic.translate(the_image.width / 2, the_image.height / 2);
 
     // video source
     // fingersVideo = createVideo(['assets/fingers.mov', 'assets/fingers.webm']);
@@ -199,8 +202,8 @@ function setup() {
 
     // start the Audio Input.
     // By default, it does not .connect() (to the computer speakers)
-    // mic.start();
-    // mic.connect(fft);
+    mic.start();
+    mic.connect(fft);
 
 
     // place our canvas, making it fit our container
@@ -221,40 +224,15 @@ function setup() {
 
 let avg_spectrum = null
 function draw() {
-    // let h_offsets = new Uint8Array(the_image.width * the_image.height + 1)
-    // for (let i = 0; i < h_offsets.length; i++) {
-    //     h_offsets[i] = sin((i + frameCount * 50) / 3000) * 0.1 + 1;
-    // }
-    // let { magPixels, phasePixels, transformedPixels } = computeForierImageTransform(the_image, h_offsets)
-    // forierMagImage = writeGrayscaleImage(magPixels, the_image.width, the_image.height)
-    // forierPhaseImage = writeGrayscaleImage(transformedPixels, the_image.width, the_image.height)
-
-    let h_offsets = new Array(the_image.width * the_image.height + 1)
-    for (let i = 0; i < h_offsets.length; i++) {
-        h_offsets[i] = sin((i + frameCount * 50) / 3000) * 0.5 + 1;
-    }
-
-    wasmImage.fft()
-    applyFFTAdjustmentWeights(wasmImage, h_offsets)
-    const logMaxMagnitude = wasmImage.fft_pixels_mag();
-    console.log("Log of max FFT magnitude:", logMaxMagnitude)
-    forierMagImage = writeGrayscaleImage(getPixels(wasmImage), the_image.width, the_image.height)
-    wasmImage.ifft()
-    forierPhaseImage = writeGrayscaleImage(getPixels(wasmImage), the_image.width, the_image.height)
-
-
-    translate(-CENTERX, -CENTERY);
-    image(forierMagImage, 0, 0, image.width, image.height)
-    image(forierPhaseImage, forierMagImage.width, 0, image.width, image.height)
-    return;
-
+    const squareWidth = the_image.width;
+    const squareHeight = the_image.height;
     let topLeftX = -width / 2;
     let topLeftY = -height / 2;
     let mouseXNorm = map(mouseX, 0, width, 0, 1);
     let mouseYNorm = map(mouseY, 0, height, 0, 1);
     let angle = frameCount * Math.PI / 800;
 
-    let scanlineRadius = min(width, height) / 2;
+    let scanlineRadius = min(squareWidth, squareHeight) / 2;
     let scanlineX = sin(angle) * scanlineRadius;
     let scanlineY = cos(angle) * scanlineRadius;
 
@@ -274,20 +252,56 @@ function draw() {
     // line(-scanlineX, -scanlineY, scanlineX, scanlineY)
 
     const segmentPct = 1 / fftBins;
-    const startX = -scanlineX, startY = -scanlineY
+    const startX = 0, startY = 0;// -scanlineX, startY = -scanlineY
     let x = startX, y = startY;
-    const avgRatio = 0.005
+    const avgRatio = 0.05
     for (let i = 0; i < fftBins; i++) {
         avg_spectrum[i] = (avg_spectrum[i] * (1 - avgRatio) + spectrum[i] * avgRatio)
-        const wiggleOffset = random(waveform[i] * 40);
-        const newX = lerp(-scanlineX, scanlineX, i * segmentPct) + (scanlineNormalX - 0.5) * wiggleOffset
-        const newY = lerp(-scanlineY, scanlineY, i * segmentPct) + (scanlineNormalY - 0.5) * wiggleOffset
-        const centerGradient = 255 - abs(segmentPct * i - 0.5) * 255 * 2;
-        stroke(centerGradient / 2, (spectrum[i] - avg_spectrum[i]) * 5, centerGradient)
-        line(x, y, newX, newY)
+        const wiggleOffset = 0; // random(waveform[i] * 40);
+        const newX = lerp(0, scanlineX, i * segmentPct) + (scanlineNormalX - 0.5) * wiggleOffset
+        const newY = lerp(0, scanlineY, i * segmentPct) + (scanlineNormalY - 0.5) * wiggleOffset
+        // const centerGradient = 255 - abs(segmentPct * i - 0.5) * 255 * 2;
+        // audioGraphic.stroke(centerGradient / 2, (spectrum[i] - avg_spectrum[i]) * 5, centerGradient)
+        audioGraphic.stroke((spectrum[i] - avg_spectrum[i]) * 5)
+        audioGraphic.line(x, y, newX, newY)
         x = newX;
         y = newY;
     }
+
+
+    audioGraphic.fill(0, 255);
+    audioGraphic.circle(0, 0, 100);
+
+    // fade out gradually
+    if (frameCount % 1 == 0) {
+        audioGraphic.blendMode(SUBTRACT); // Workaround from here: https://stackoverflow.com/questions/6817729/gradual-fading-by-drawing-a-transparent-rectangle-repeatedly
+        audioGraphic.fill(255, 100);
+        audioGraphic.rect(-squareWidth / 2, -squareHeight / 2, squareWidth, squareHeight);
+        audioGraphic.blendMode(BLEND);
+    }
+
+
+
+
+    // let h_offsets = new Array(the_image.width * the_image.height + 1)
+    // for (let i = 0; i < h_offsets.length; i++) {
+    //     h_offsets[i] = sin((i * mouseYNorm) / (mouseXNorm + 300)) * 0.5 + 1;
+    // }
+
+    h_offsets = getGrayscalePixels(audioGraphic)
+
+    wasmImage.fft()
+    applyFFTAdjustmentWeights(wasmImage, h_offsets)
+    const logMaxMagnitude = wasmImage.fft_pixels_mag();
+    // console.log("Log of max FFT magnitude:", logMaxMagnitude)
+    forierMagImage = writeGrayscaleImage(getPixels(wasmImage), the_image.width, the_image.height)
+    wasmImage.ifft()
+    forierPhaseImage = writeGrayscaleImage(getPixels(wasmImage), the_image.width, the_image.height)
+
+    translate(-CENTERX, -CENTERY);
+    image(forierMagImage, 0, 0, image.width, image.height)
+    image(forierPhaseImage, forierMagImage.width, 0, image.width, image.height)
+
 
     // x = startX, y = startY;
     // for (let i = 0; i < waveform.length; i++) {
@@ -301,13 +315,7 @@ function draw() {
     //     y = newY;
     // }
 
-    // fade out gradually
-    if (frameCount % 3 == 0) {
-        blendMode(SUBTRACT); // Workaround from here: https://stackoverflow.com/questions/6817729/gradual-fading-by-drawing-a-transparent-rectangle-repeatedly
-        fill(255, 1);
-        rect(topLeftX, topLeftY, width, height);
-        blendMode(BLEND);
-    }
+
 
 }
 

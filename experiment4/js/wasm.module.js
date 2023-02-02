@@ -8,7 +8,7 @@ import { Image } from './rust-fft-2d/pkg/rust_fft_2d.js';
 
 window.create2dfftImage = (width, height, pixels) => {
     const image = Image.new(width, height);
-    const pixelsPtr = image.pixels();
+    const pixelsPtr = image.input_pixels_ptr();
     const pixelsWasmArray = new Uint8Array(wasm_memory.buffer, pixelsPtr, width * height);
     for (let i = 0; i < pixelsWasmArray.length; i++) {
         pixelsWasmArray[i] = pixels[i];
@@ -16,47 +16,39 @@ window.create2dfftImage = (width, height, pixels) => {
     return image;
 }
 
-// window.runFft = (wasmImage) => {
-//     const img = wasmImage;
-//     img.fft()
-// }
 
-// window.getMagPixels = (wasmImage) => {
-//     const img = wasmImage;
-//     img.fft()
-//     img.ifft();
-//     const logMaxMagnitude = img.fft_pixels_mag();
-// }
-
-
+/**
+ *
+ * @param {Image} wasmImage
+ * @param {Float64Array} pxlWeights
+ * @returns {Image} the original image reference
+ */
 window.applyFFTAdjustmentWeights = (wasmImage, pxlWeights) => {
     const img = wasmImage;
-    const pixelsPtr = img.pix_adjustment_weights()
-    const pixelsWasmArray = new Float64Array(wasm_memory.buffer, pixelsPtr, img.width() * img.height());
-    for (let i = 0; i < pixelsWasmArray.length; i++) {
-        pixelsWasmArray[i] = pxlWeights[i];
+    const weightsPtr = img.pix_adjustment_weight_ptr()
+    const weightsWasmArray = new Float64Array(wasm_memory.buffer, weightsPtr, img.width() * img.height());
+    for (let i = 0; i < weightsWasmArray.length; i++) {
+        weightsWasmArray[i] = pxlWeights[i];
     }
     img.apply_adjustment_weights()
     return img;
 }
 
-window.runInverseFft = (wasmImage) => {
-    const img = wasmImage;
-    img.ifft();
-
-    const pixelsArray = new Uint8Array(wasm_memory.buffer, img.pixels(), img.width() * img.height());
-    return pixelsArray;
-}
-
-
+/**
+ * @param {Image} wasmImage
+ * @returns {Uint8Array} the output pixels
+ */
 window.getPixels = (wasmImage) => {
-    return new Uint8Array(wasm_memory.buffer, wasmImage.pixels(), wasmImage.width() * wasmImage.height());
+    return new Uint8Array(wasm_memory.buffer, wasmImage.output_pixels_ptr(), wasmImage.width() * wasmImage.height());
 }
 
-
+/**
+ * @param {Image} wasmImage
+ * @returns {Uint8Array} the pixel offsets as set in the image
+ */
 window.offsetPxls = (wasmImage) => {
     let pxlFloats = new Float64Array(wasm_memory.buffer, wasmImage.pix_adjustment_weights(), wasmImage.width() * wasmImage.height());
-    return new Uint8Array(pxlFloats.map((pxl) => (pxl) * 200));
+    return new Uint8Array(pxlFloats.map((pxl) => (pxl) * 255));
 }
 
 
