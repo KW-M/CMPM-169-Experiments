@@ -1,11 +1,17 @@
 import init from './rust-fft-2d/pkg/rust_fft_2d.js';
 // import { memory } from "./rust-fft-2d/pkg/rust_fft_2d_bg.js";
 import { Image } from './rust-fft-2d/pkg/rust_fft_2d.js';
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date: https://rustwasm.github.io/docs/book/game-of-life/implementing.html
 
 
+// Rust Wasm Based on this tutorial: https://rustwasm.github.io/docs/book/game-of-life/implementing.html
+
+/**
+ *
+ * @param {Number} width width of the image to create
+ * @param {*} height height of the image to create
+ * @param {*} pixels
+ * @returns
+ */
 window.create2dfftImage = (width, height, pixels) => {
     const image = Image.new(width, height);
     const pixelsPtr = image.input_pixels_ptr();

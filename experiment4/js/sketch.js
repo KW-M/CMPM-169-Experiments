@@ -1,7 +1,8 @@
 
 // sketch.js - purpose and description here
-// Author: Your Name
-// Date: https://rustwasm.github.io/docs/book/game-of-life/implementing.html
+// Author: Kyle Worcester-Moore
+// Date: Feb 2, 2023
+
 
 
 // CONSTS
@@ -198,12 +199,13 @@ function setup() {
     fft = new p5.FFT();
 
     // Create an Audio input
-    let mic = new p5.AudioIn()
+    window.mic = new p5.AudioIn()
 
     // start the Audio Input.
     // By default, it does not .connect() (to the computer speakers)
     mic.start();
     mic.connect(fft);
+    mic.connect
 
 
     // place our canvas, making it fit our container

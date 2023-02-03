@@ -1,7 +1,6 @@
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date:
-
+// sketch.js - Flow Field with lookup grid
+// Author: Kyle Worcester-Moore
+// Date: January 29, 2023
 
 // Inspired by: https://openprocessing.org/sketch/1769288
 // Inspired by: https://openprocessing.org/sketch/1752310
