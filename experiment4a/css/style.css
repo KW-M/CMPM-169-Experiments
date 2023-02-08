@@ -1,0 +1,23 @@
+/* style.css */
+
+/* Set the canvas element to be the full size of the window */
+canvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* Center the canvas element on the page */
+body {
+    background: rgb(49, 1, 68);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    align-items: stretch;
+    margin: 0;
+}
+
+#canvas-container {
+    width: 100%;
+    height: calc(100vh - 100px);
+}
