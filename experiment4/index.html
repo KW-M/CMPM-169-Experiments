@@ -35,44 +35,60 @@
 	<main id="content">
 		<section>
 			<h1>Experiment 2 - Video, Vectors and Interactivity</h1>
+
+			<p>
+			<h4><b>Explainer:</b> WT*?! am I looking at?</h4>
+			This experiment was an attempt to see what would happen if you put the output of a 1d fast forier
+			transform as the input to a 2d fast forier transform using a radar-like
+			visualization to
+			get the 1d forier transform into 2d pixels. This turned out to create very unique but rather uninteresting
+			noise patters,
+			so instead I created a very overcomplecated image effect that trasitions the 2d forier
+			transform of one image into the 2d forier transform of another image modulated by the 1d forier
+			tranform of the microphone as seen in the left plot. The output on the right is the reverse 2d forier
+			transform of the 2d fast forier transform seen on the left in the background.
+			</p>
 			<div class="minor-section">
 				<h2>Imitate</h2>
-				<p>I began my search with the rotating shape shader p5js example <a
-						href="https://editor.p5js.org/KW-M/sketches/wdNXkzrkP">found here</a>. That showed how to setup
-					a webgl shader context in p5 and create n-sided polygons in GLSL. Then I used the examples from <a
-						href="https://editor.p5js.org/p5/sketches/Dom:_Video_Pixels">video pixels</a> and <a
-						href="https://p5js.org/examples/3d-shader-using-webcam.html">webcam</a> to get the webcam video
-					feed into the shader. </p>
-			</div>
-
-			<div class="minor-section">
-				<h2>Integrate</h2>
-				<p> By Tying the shape to the movement and press of the mouse I got the shape to feel more alive /
-					interesting. I used the alpha channel of the shape to layer, crop and invert the video in
-					interesting ways.</p>
-			</div>
-
-			<div class="minor-section">
-				<h2>Innovate</h2>
-				<p>The last thing I discovered kindof accidentaly, which is that in Firefox, the colors past the bounds
-					of a webgl texture are just the nearest edge streached into thin lines along x or y. It was fun to
-					play around with, but I wanted to tie it into the mouse control scheme. I took some inspiration from
-					<a href="https://www.justareflektor.com">www.justareflektor.com</a> and I ended up replicating the
-					edge effect by using the x and y "crosshairs" of the mouse position as locations to sample the
-					texture
-					for the full height and width of the canvas. And clicking blends those lines in a subtractive mode
-					with the original video, creating an interesting dark ranbow effect.
+				<p>I began my search with the p5 audio FFT <a href="https://p5js.org/reference/#/p5.FFT">example</a> and
+					mic input <a href="https://p5js.org/examples/sound-mic-input.html">example</a>. plotting the FFT
+					result and offsetting it with the waveform
+					along a rotating axis gave these cool effects
 				</p>
 			</div>
 
 			<div class="minor-section">
+				<h2>Integrate</h2>
+				<p> Next I tried integrating the js 2d fft library from <a
+						href="https://github.com/turbomaze/JS-Fourier-Image-Analysis">turbomaze</a>, and got a proof of
+					concept going, but unfortunately the computational cost in javascript was too high, and the
+					framerate became really bad</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Innovate</h2>
+				<p>To get the vizualization running at a live framerate, I switched to writing the code in
+					rust and running it using webassembly. The result was very fast and allowed me to finally test the
+					end-to end process from microphone through canvas to pixels to inverse 2d FFT to final image output.
+					The resulting
+					pattern was interesting, slowly shifting and gaining detail like a living soup, but in the end not
+					very
+					beautiful to a human, especially since I only had one input for both the frequency and phase
+					domains. Instead I switched to using the forier transform of two images and transisitoned between
+					them. Finally I re-applied the colored audio vizualizer to help vizually see where the fft image was
+					being changed.</p>
+
+			</div>
+
+			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>This was a personal project. I found it cool how easy it was to get the webcam in, but hard to think
-					about the math to get the screen space to line up with the canvas and mouse. Also frustratingly,
-					using the canvas with a custom shader and drawing normal p5 js shapes doesn't work. Adding a
-					seperate offscreen graphics element solves this, but brings the framerate way down. I think I'm
-					particularly interested in the GPU shading, despite being harder to think about, because I'm also
-					trying to learn parallel programming this quarter, and I wan't to practice that way of thinking.</p>
+				<p>This project was more of personal voyage through many technically challenging topics. As with many
+					explorations, the original intent was to find something really unique and interesting, but I
+					ultimately came up short. Though the result is interesting, the 2d inverse FFT never produced
+					patterns that were very humanly pleasing at a rate fast enough for apreciation. Only by sitting back
+					and watching, could I get lost in the s. Switching to known images partially solves this as it gives
+					viewers something inmediately recongnizable to start to grasp.
+				</p>
 			</div>
 
 

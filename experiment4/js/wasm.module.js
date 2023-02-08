@@ -22,6 +22,14 @@ window.create2dfftImage = (width, height, pixels) => {
     return image;
 }
 
+window.write2dfftImage = (image, width, height, pixels) => {
+    const pixelsPtr = image.input_pixels_ptr();
+    const pixelsWasmArray = new Uint8Array(wasm_memory.buffer, pixelsPtr, width * height);
+    for (let i = 0; i < pixelsWasmArray.length; i++) {
+        pixelsWasmArray[i] = pixels[i];
+    }
+    return image;
+}
 
 /**
  *

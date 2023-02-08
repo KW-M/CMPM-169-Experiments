@@ -18,11 +18,11 @@ let canvasContainer;
 let theShader;
 let fingersVideo;
 let cam;
-let the_image;
+let first_image;
 let camReady = false;
 let fft;
 let wasmImage;
-let audioGraphic;
+let audioGraphic, overlayVizGraphic;
 let forierMagImage, forierPhaseImage;
 
 
@@ -30,7 +30,8 @@ let forierMagImage, forierPhaseImage;
 let mousePress = false;
 
 async function preload() {
-    the_image = loadImage("./assets/bigsur.png")
+    first_image = loadImage("./assets/bigsur.png")
+    second_image = loadImage("./assets/bridge.png")
     await initWasm().then((wasm) => {
         window.wasm_memory = wasm.memory;
         console.log('wasm loaded');
@@ -59,13 +60,14 @@ function getGrayscalePixels(targetImage) {
     return outpixels
 }
 
-function writeGrayscaleImage(pixels, width, height) {
+function writeGrayscaleImage(pixels, width, height, alpha) {
+    console.log(alpha)
     const g = createGraphics(width, height)
     for (let y = 0; y < height; y += 1) {  // rows
         for (let x = 0; x < width; x += 1) {  // pixels in row
             let index = y * width + x;
             // if (index < width * 4) console.log(x, y, index)
-            g.set(x, y, pixels[index])
+            g.set(x, y, [pixels[index], pixels[index], pixels[index], alpha])
         }
     }
     g.updatePixels()
@@ -172,10 +174,13 @@ function computeForierImageTransform(targetImage, offsets) {
 function setup() {
     // wasm.greet();
 
-    wasmImage = create2dfftImage(the_image.width, the_image.height, getGrayscalePixels(the_image));
+    wasmImage = create2dfftImage(first_image.width, first_image.height, getGrayscalePixels(first_image));
+    second_image
     canvasContainer = $("#canvas-container");
-    audioGraphic = createGraphics(the_image.width, the_image.height, WEBGL);
-    // audioGraphic.translate(the_image.width / 2, the_image.height / 2);
+    audioGraphic = createGraphics(first_image.width, first_image.height, WEBGL);
+    overlayVizGraphic = createGraphics(first_image.width, first_image.height);
+    overlayVizGraphic.translate(first_image.width / 2, first_image.height / 2);
+    // audioGraphic.translate(first_image.width / 2, first_image.height / 2);
 
     // video source
     // fingersVideo = createVideo(['assets/fingers.mov', 'assets/fingers.webm']);
@@ -226,13 +231,13 @@ function setup() {
 
 let avg_spectrum = null
 function draw() {
-    const squareWidth = the_image.width;
-    const squareHeight = the_image.height;
+    const squareWidth = first_image.width;
+    const squareHeight = first_image.height;
     let topLeftX = -width / 2;
     let topLeftY = -height / 2;
     let mouseXNorm = map(mouseX, 0, width, 0, 1);
     let mouseYNorm = map(mouseY, 0, height, 0, 1);
-    let angle = frameCount * Math.PI / 800;
+    let angle = frameCount * Math.PI / 96.92653694;
 
     let scanlineRadius = min(squareWidth, squareHeight) / 2;
     let scanlineX = sin(angle) * scanlineRadius;
@@ -283,42 +288,50 @@ function draw() {
     }
 
 
-
-
-    // let h_offsets = new Array(the_image.width * the_image.height + 1)
+    // let h_offsets = new Array(first_image.width * first_image.height + 1)
     // for (let i = 0; i < h_offsets.length; i++) {
     //     h_offsets[i] = sin((i * mouseYNorm) / (mouseXNorm + 300)) * 0.5 + 1;
     // }
 
     h_offsets = getGrayscalePixels(audioGraphic)
 
-    wasmImage.fft()
+    write2dfftImage(wasmImage, first_image.width, first_image.height, getGrayscalePixels(first_image));
+    wasmImage.fft(1)
+    write2dfftImage(wasmImage, second_image.width, second_image.height, getGrayscalePixels(second_image));
+    wasmImage.fft(2)
     applyFFTAdjustmentWeights(wasmImage, h_offsets)
     const logMaxMagnitude = wasmImage.fft_pixels_mag();
     // console.log("Log of max FFT magnitude:", logMaxMagnitude)
-    forierMagImage = writeGrayscaleImage(getPixels(wasmImage), the_image.width, the_image.height)
-    wasmImage.ifft()
-    forierPhaseImage = writeGrayscaleImage(getPixels(wasmImage), the_image.width, the_image.height)
-
     translate(-CENTERX, -CENTERY);
-    image(forierMagImage, 0, 0, image.width, image.height)
-    image(forierPhaseImage, forierMagImage.width, 0, image.width, image.height)
-
-
-    // x = startX, y = startY;
-    // for (let i = 0; i < waveform.length; i++) {
-    //     const wiggleOffset = waveform[i] * 90;
-    //     const newX = lerp(-scanlineX, scanlineX, i * segmentPct) + (scanlineNormalX - 0.5) * wiggleOffset
-    //     const newY = lerp(-scanlineY, scanlineY, i * segmentPct) + (scanlineNormalY - 0.5) * wiggleOffset
-
-    //     stroke(255, 50);
-    //     line(x, y, newX, newY)
-    //     x = newX;
-    //     y = newY;
-    // }
+    if (frameCount % 7 === 0) {
+        forierMagImage = writeGrayscaleImage(getPixels(wasmImage), first_image.width, first_image.height, 40)
+        image(forierMagImage, 0, 0, image.width, image.height)
+    }
+    wasmImage.ifft()
+    forierPhaseImage = writeGrayscaleImage(getPixels(wasmImage), first_image.width, first_image.height, 255)
+    image(forierPhaseImage, first_image.width, 0, image.width, image.height)
 
 
 
+
+    x = startX;
+    y = startY;
+    for (let i = 0; i < fftBins; i++) {
+        avg_spectrum[i] = (avg_spectrum[i] * (1 - avgRatio) + spectrum[i] * avgRatio)
+        const wiggleOffset = random(waveform[i] * 40);
+        const newX = lerp(0, scanlineX, i * segmentPct) + (scanlineNormalX - 0.5) * wiggleOffset
+        const newY = lerp(0, scanlineY, i * segmentPct) + (scanlineNormalY - 0.5) * wiggleOffset
+        const centerGradient = 255 - abs(segmentPct * i - 0.5) * 255 * 2;
+        overlayVizGraphic.stroke(centerGradient / 2, (spectrum[i] - avg_spectrum[i]) * 5, centerGradient)
+        overlayVizGraphic.line(x, -y, newX, -newY)
+        x = newX;
+        y = newY;
+    }
+
+
+    image(overlayVizGraphic, 0, 0, image.width, image.height)
+    overlayVizGraphic.clear();
+    // overlayVizGraphic
 }
 
 

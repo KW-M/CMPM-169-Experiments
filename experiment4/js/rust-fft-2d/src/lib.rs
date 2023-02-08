@@ -1,5 +1,7 @@
 mod utils;
 
+use std::cmp::min;
+
 // wasm-pack build --target web
 use fft2d::slice::{fft_2d, fftshift, ifft_2d, ifftshift};
 use wasm_bindgen::prelude::*;
@@ -30,7 +32,8 @@ pub struct Image {
     input_pixels: Vec<u8>,
     output_pixels: Vec<u8>,
     pixel_adjustment_weights: Vec<f64>,
-    h_hats: Vec<Complex<f64>>,
+    h_hats1: Vec<Complex<f64>>,
+    h_hats2: Vec<Complex<f64>>,
 }
 
 #[wasm_bindgen]
@@ -42,7 +45,8 @@ impl Image {
             input_pixels: vec![0; width * height],
             output_pixels: vec![0; width * height],
             pixel_adjustment_weights: vec![1.0; width * height],
-            h_hats: vec![Complex::new(0.0, 0.0); width * height],
+            h_hats1: vec![Complex::new(0.0, 0.0); width * height],
+            h_hats2: vec![Complex::new(0.0, 0.0); width * height],
         }
     }
 
@@ -68,26 +72,45 @@ impl Image {
 
     pub fn apply_adjustment_weights(&mut self) {
         let mut i = 0;
-        for x in self.h_hats.iter_mut() {
-            let (r, theta) = x.to_polar();
+        // for x in self.h_hats1.iter_mut() {
+
+        let len = min(self.h_hats1.len(), self.h_hats2.len());
+        while i < len {
+            let (r1, theta1) = self.h_hats1[i].to_polar();
+            let (r2, theta2) = self.h_hats2[i].to_polar();
+
+            // let theta_out = (theta1 + theta2) / 2.0;
+            // let r_out = (r1 + r2) / 2.0;
+
+            // let two_weight = self.pixel_adjustment_weights[i] / 255.0;
+            let two_weight = self.pixel_adjustment_weights[i].min(1.0);
+            let one_weight = 1.0 - two_weight;
+
+            let theta_out = theta1 * one_weight + theta2 * two_weight;
+            let r_out = r1 * one_weight + r2 * two_weight;
+
             // let theta2 = theta * (self.pixel_adjustment_weights[i] as f64 / 25.0);
             // let r2 = r * (self.pixel_adjustment_weights[i] as f64 / 25.0 + 1.0);
-            let theta2 = 0.0;
-            let r2 =
-                (self.pixel_adjustment_weights[i] / 25500.0 * (self.width * self.height) as f64);
+
+            // let theta2 = theta * (self.pixel_adjustment_weights[i] as f64 / 25.0);
+            // let r2 = r * (self.pixel_adjustment_weights[i] as f64 / 25.0 + 1.0);
+
+            // let theta2 = 0.0;
+            // let r2 =
+            //     (self.pixel_adjustment_weights[i] / 25500.0 * (self.width * self.height) as f64);
             // let r2 = (self.width * self.height) as f64 / self.height as f64;
-            *x = Complex::from_polar(r2, r2);
+            self.h_hats1[i] = Complex::from_polar(r_out, theta_out);
             i += 1;
         }
 
         // test:
-        // for x in self.h_hats.iter_mut() {
+        // for x in self.h_hats1.iter_mut() {
         //     *x *= (i as f64 / 300.0).sin() * 0.5 + 1.0;
         //     i += 1;
         // }
     }
 
-    pub fn fft(&mut self) {
+    pub fn fft(&mut self, which_hats: i32) {
         // Convert the image buffer to complex numbers to be able to compute the FFT.
         let mut img_buffer: Vec<Complex<f64>> = self
             .input_pixels
@@ -96,12 +119,16 @@ impl Image {
             .collect();
         fft_2d(self.width as usize, self.height as usize, &mut img_buffer);
         img_buffer = fftshift(self.width as usize, self.height as usize, &img_buffer);
-        self.h_hats = img_buffer;
+        if which_hats == 1 {
+            self.h_hats1 = img_buffer;
+        } else if which_hats == 2 {
+            self.h_hats2 = img_buffer;
+        }
     }
 
     pub fn ifft(&mut self) {
         // Convert the h_hats back to pixels.
-        let mut img_buffer = ifftshift(self.width as usize, self.height as usize, &self.h_hats);
+        let mut img_buffer = ifftshift(self.width as usize, self.height as usize, &self.h_hats1);
         ifft_2d(self.width as usize, self.height as usize, &mut img_buffer);
 
         // Normalize the data after FFT and IFFT.
@@ -119,7 +146,7 @@ impl Image {
 
     pub fn fft_pixels_mag(&mut self) -> f64 {
         let pixels: Vec<f64> = self
-            .h_hats
+            .h_hats1
             .iter()
             .map(|&imag| imag.norm_sqr().sqrt() as f64)
             .collect();
