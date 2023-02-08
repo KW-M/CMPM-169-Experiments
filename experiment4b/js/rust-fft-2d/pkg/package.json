@@ -1,0 +1,15 @@
+{
+  "name": "rust-fft-2d",
+  "collaborators": [
+    "Kyle Worcester-Moore"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "rust_fft_2d_bg.wasm",
+    "rust_fft_2d.js",
+    "rust_fft_2d.d.ts"
+  ],
+  "module": "rust_fft_2d.js",
+  "types": "rust_fft_2d.d.ts",
+  "sideEffects": false
+}
