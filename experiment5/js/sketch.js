@@ -14,45 +14,31 @@ const VALUE2 = 2;
 let myInstance;
 let canvasContainer;
 
-class MyClass {
-    constructor(param1, param2) {
-        this.property1 = param1;
-        this.property2 = param2;
-    }
-
-    myMethod() {
-        // code to run when method is called
-    }
-}
-
 // setup() function is called once when the program starts
 function setup() {
     // place our canvas, making it fit our container
     canvasContainer = $("#canvas-container");
-    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
+    let canvas = createCanvas(canvasContainer.width(), canvasContainer.height(), WEBGL);
     canvas.parent("canvas-container");
     // resize canvas is the page is resized
     $(window).on("resize", function () {
         console.log("Resizing...");
         resizeCanvas(canvasContainer.width(), canvasContainer.height());
     });
-    // create an instance of the class
-    myInstance = new MyClass(VALUE1, VALUE2);
 
-    var centerHorz = windowWidth / 2;
-    var centerVert = windowHeight / 2;
 }
 
 // draw() function is called repeatedly, it's the main animation loop
 function draw() {
     background(220);
-    // call a method on the instance
-    myInstance.myMethod();
+
+    translate(-canvasContainer.width() / 2, -canvasContainer.height() / 2);
 
     // Put drawings here
     var centerHorz = canvasContainer.width() / 2 - 125;
     var centerVert = canvasContainer.height() / 2 - 125;
     fill(234, 31, 81);
+
     noStroke();
     rect(centerHorz, centerVert, 250, 250);
     fill(255);

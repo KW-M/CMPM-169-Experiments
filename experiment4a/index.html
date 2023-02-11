@@ -3,7 +3,7 @@
 
 <head>
 	<!-- This title is used for tabs and bookmarks -->
-	<title>Experiment 2 - Video, Vectors and Interactivity</title>
+	<title>Experiment 4A - Audio Viz</title>
 
 	<!-- Use UTF character set, a good idea with any webpage -->
 	<meta charset="UTF-8" />
@@ -12,7 +12,7 @@
 
 	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
 	<link rel="stylesheet" type="text/css" href="../css/site.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+
 
 	<!-- Load jQuery library -->
 	<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
@@ -24,12 +24,14 @@
 	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
 	<!-- Use me for a p5.js project -->
 	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+	<script type="text/javascript" src="../js/page.js" DEFER></script>
 </head>
 
 <body>
 	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
 	<div id="canvas-container">
 		<!-- canvas will be added here -->
+		<button id="scroll-page-btn">i</button>
 	</div>
 	<main id="content">
 		<section>
@@ -37,9 +39,9 @@
 			</h1>
 		</section>
 		<nav id="links">
+			<a href="../">Home</a>
 			<a href="../experiment4b/">Part B</a>
 			<a href="../experiment4c">Part C</a>
-			<a href="../">Home</a>
 		</nav>
 	</main>
 </body>

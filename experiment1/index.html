@@ -12,7 +12,7 @@
 
 	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
 	<link rel="stylesheet" type="text/css" href="../css/site.css">
-	<link rel="stylesheet" type="text/css" href="css/style.css">
+
 
 	<!-- Load jQuery library -->
 	<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
@@ -24,12 +24,14 @@
 	<script type="text/javascript" src="./js/project.js" DEFER></script>
 	<!-- Use me for a p5.js project -->
 	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+	<script type="text/javascript" src="../js/page.js" DEFER></script>
 </head>
 
 <body>
 	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
 	<div id="canvas-container">
 		<!-- canvas will be added here -->
+		<button id="scroll-page-btn">i</button>
 	</div>
 	<main id="content">
 		<section>
@@ -81,7 +83,7 @@
 
 		</section>
 		<nav id="links">
-			<!-- Put links to other pages (including the homepage) here. -->
+			<a href="../">Home</a>
 		</nav>
 	</main>
 </body>

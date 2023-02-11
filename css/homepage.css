@@ -1,5 +1,6 @@
-
 .cat-photo {
+  float: left;
   margin: 10px;
   max-width: 500px;
+  width: calc(100% - 20px);
 }
