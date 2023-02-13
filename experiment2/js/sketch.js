@@ -1,6 +1,6 @@
 // sketch.js - purpose and description here
-// Author: Your Name
-// Date:
+// Author: Kyle Worcester-Moore
+// Date: Jan 23, 2023
 
 /*
  * @name Video GPU Tests

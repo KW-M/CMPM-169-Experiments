@@ -1,14 +1,15 @@
 
-// sketch.js - purpose and description here
-// Author: Your Name
-// Date: https://rustwasm.github.io/docs/book/game-of-life/implementing.html
+// sketch.js - FFT iFFT TTFTTiFTTFTTSi Si?
+// Author: Kyle Worcester-Moore
+// Date:
+
+// Used this excelent rust WASM tutorial:
+// https://rustwasm.github.io/docs/book/game-of-life/implementing.html
 
 
 // CONSTS
 let fftBins = 250;
 var contrastConst = 9e-3; // contrast constant
-
-
 
 // Globals
 let CENTERX = 0;
@@ -22,9 +23,6 @@ let camReady = false;
 let fft;
 let wasmImage;
 let forierMagImage, forierPhaseImage;
-
-
-
 let mousePress = false;
 
 async function preload() {
@@ -67,10 +65,8 @@ let avg_spectrum = null
 function draw() {
     let topLeftX = -width / 2;
     let topLeftY = -height / 2;
-    let mouseXNorm = map(mouseX, 0, width, 0, 1);
-    let mouseYNorm = map(mouseY, 0, height, 0, 1);
-    let angle = frameCount * Math.PI / 800;
 
+    let angle = frameCount * Math.PI / 800;
     let scanlineRadius = min(width, height) / 2;
     let scanlineX = sin(angle) * scanlineRadius;
     let scanlineY = cos(angle) * scanlineRadius;
@@ -86,9 +82,6 @@ function draw() {
     if (avg_spectrum == null) {
         avg_spectrum = spectrum
     }
-
-
-    // line(-scanlineX, -scanlineY, scanlineX, scanlineY)
 
     const segmentPct = 1 / fftBins;
     const startX = -scanlineX, startY = -scanlineY
@@ -106,18 +99,6 @@ function draw() {
         y = newY;
     }
 
-    // x = startX, y = startY;
-    // for (let i = 0; i < waveform.length; i++) {
-    //     const wiggleOffset = waveform[i] * 90;
-    //     const newX = lerp(-scanlineX, scanlineX, i * segmentPct) + (scanlineNormalX - 0.5) * wiggleOffset
-    //     const newY = lerp(-scanlineY, scanlineY, i * segmentPct) + (scanlineNormalY - 0.5) * wiggleOffset
-
-    //     stroke(255, 50);
-    //     line(x, y, newX, newY)
-    //     x = newX;
-    //     y = newY;
-    // }
-
     // fade out gradually
     if (frameCount % 3 == 0) {
         blendMode(SUBTRACT); // Workaround from here: https://stackoverflow.com/questions/6817729/gradual-fading-by-drawing-a-transparent-rectangle-repeatedly
@@ -125,7 +106,6 @@ function draw() {
         rect(topLeftX, topLeftY, width, height);
         blendMode(BLEND);
     }
-
 }
 
 

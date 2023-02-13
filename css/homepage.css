@@ -1,6 +1,30 @@
+#content {
+  text-align: center;
+}
+
+#content {
+  border-radius: 20px;
+}
+
+#content .minor-section {
+  border-radius: 20px;
+}
+
 .cat-photo {
   float: left;
   margin: 10px;
   max-width: 500px;
   width: calc(100% - 20px);
+  border-radius: 20px;
+}
+
+.attribution {
+  font-size: small;
+  text-align: center;
+  margin-top: 1.5rem;
+  color: rgba(255, 235, 205, 0.349)
+}
+
+.subtitle {
+  font-weight: normal;
 }

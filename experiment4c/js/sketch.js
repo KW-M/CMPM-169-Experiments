@@ -3,13 +3,9 @@
 // Author: Kyle Worcester-Moore
 // Date: Feb 2, 2023
 
-
-
 // CONSTS
 let fftBins = 250;
 var contrastConst = 9e-3; // contrast constant
-
-
 
 // Globals
 let CENTERX = 0;

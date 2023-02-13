@@ -175,25 +175,6 @@ function setup() {
     wasmImage = create2dfftImage(the_image.width, the_image.height, getGrayscalePixels(the_image));
     canvasContainer = $("#canvas-container");
     audioGraphic = createGraphics(the_image.width, the_image.height, WEBGL);
-    // audioGraphic.translate(the_image.width / 2, the_image.height / 2);
-
-    // video source
-    // fingersVideo = createVideo(['assets/fingers.mov', 'assets/fingers.webm']);
-    // fingersVideo.loop();
-
-    // // camera source
-    // cam = createCapture(VIDEO, () => { console.log(camReady); camReady = true });
-    // cam.size(canvasContainer.width() / 2, canvasContainer.height() / 2);
-    // cam.hide();
-
-    // canvasContainer.html("<h2>Allow camera to see demo 📹</h2>")
-
-    // let i_id = setInterval(() => {
-    //     if (!camReady) return;
-    //     clearInterval(i_id)
-    //     $("#canvas-container>h2").remove();
-    // }, 10)
-
 
     // create a Fast forier transform:
     fft = new p5.FFT();
@@ -202,11 +183,9 @@ function setup() {
     window.mic = new p5.AudioIn()
 
     // start the Audio Input.
-    // By default, it does not .connect() (to the computer speakers)
     mic.start();
     mic.connect(fft);
     mic.connect
-
 
     // place our canvas, making it fit our container
     canvasContainer = $("#canvas-container");
@@ -221,19 +200,14 @@ function setup() {
         CENTERY = height / 2;
     }; $(window).on("resize", resizeFunc)
     resizeFunc();
-
 }
 
 let avg_spectrum = null
 function draw() {
     const squareWidth = the_image.width;
     const squareHeight = the_image.height;
-    let topLeftX = -width / 2;
-    let topLeftY = -height / 2;
-    let mouseXNorm = map(mouseX, 0, width, 0, 1);
-    let mouseYNorm = map(mouseY, 0, height, 0, 1);
-    let angle = frameCount * Math.PI / 800;
 
+    let angle = frameCount * Math.PI / 800;
     let scanlineRadius = min(squareWidth, squareHeight) / 2;
     let scanlineX = sin(angle) * scanlineRadius;
     let scanlineY = cos(angle) * scanlineRadius;
@@ -243,15 +217,11 @@ function draw() {
 
 
     // get forier transform of sound
-    let waveform = fft.waveform();
     let spectrum = fft.analyze();
     fftBins = spectrum.length
     if (avg_spectrum == null) {
         avg_spectrum = spectrum
     }
-
-
-    // line(-scanlineX, -scanlineY, scanlineX, scanlineY)
 
     const segmentPct = 1 / fftBins;
     const startX = 0, startY = 0;// -scanlineX, startY = -scanlineY
@@ -283,22 +253,6 @@ function draw() {
     translate(-CENTERX, -CENTERY);
     image(forierMagImage, 0, 0, image.width, image.height)
     image(forierPhaseImage, forierMagImage.width, 0, image.width, image.height)
-
-
-    // x = startX, y = startY;
-    // for (let i = 0; i < waveform.length; i++) {
-    //     const wiggleOffset = waveform[i] * 90;
-    //     const newX = lerp(-scanlineX, scanlineX, i * segmentPct) + (scanlineNormalX - 0.5) * wiggleOffset
-    //     const newY = lerp(-scanlineY, scanlineY, i * segmentPct) + (scanlineNormalY - 0.5) * wiggleOffset
-
-    //     stroke(255, 50);
-    //     line(x, y, newX, newY)
-    //     x = newX;
-    //     y = newY;
-    // }
-
-
-
 }
 
 
