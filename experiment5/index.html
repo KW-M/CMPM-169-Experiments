@@ -15,15 +15,14 @@
 
 
 	<!-- Load jQuery library -->
-	<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+	<script src="../js/jquery-3.6.3.min.js"></script>
 	<!-- Load p5.js library -->
-	<script src="./js/p5.min.js"></script>
-	<script src="./js/p5.sound.min.js"></script>
-	<script src="./js/fourier.js"></script>
+	<script src="../js/p5.min.js"></script>
+	<script src="../js/p5.sound.min.js"></script>
+
 
 	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
 	<!-- Use me for a p5.js project -->
-	<script type="module" src="./js/wasm.module.js"></script>
 	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
 	<script type="text/javascript" src="../js/page.js" DEFER></script>
 </head>
@@ -36,60 +35,49 @@
 	</div>
 	<main id="content">
 		<section>
-			<h1>Experiment 5 - Cherish Our Home</h1>
+			<h1>Experiment 5 - Our Home</h1>
 			<p>
-			<h4><b>Explainer:</b> WT*?! am I looking at?</h4>
-			This experiment was an attempt to see what would happen if you put the output of a 1d fast fourier
-			transform as the input to a 2d fast fourier transform using a radar-like
-			visualization to
-			get the 1d fourier transform into 2d pixels. This turned out to create very unique but rather uninteresting
-			noise patters,
-			so instead I created a very overcomplecated image effect that trasitions the 2d fourier
-			transform of one image into the 2d fourier transform of another image modulated by the 1d fourier
-			tranform of the microphone as seen in the left plot. The output on the right is the reverse 2d fourier
-			transform of the 2d fast fourier transform seen on the left in the background.
+				In this experiment I played with webgl vertex shaders. I initially based it on the <a
+					href="https://github.com/aferriss/p5jsShaderExamples/tree/gh-pages/6_3d">P5 Shader 3d Examples</a>,
+				especially the displacement texture and normal displacement examples.
+
 			</p>
-			<div class="minor-section">
+			<div class=" minor-section">
 				<h2>Imitate</h2>
-				<p>I began my search with the p5 audio FFT <a href="https://p5js.org/reference/#/p5.FFT">example</a> and
-					mic input <a href="https://p5js.org/examples/sound-mic-input.html">example</a>. plotting the FFT
-					result and offsetting it with the waveform
-					along a rotating axis gave these cool effects
+				<p>Originally I tried to use the
+					depth buffer to give the computed displacement a nicer SSAO look while maintaining the nice glowing
+					effect of simply displaying the normals.
+					Later I decided to try the texture displacement with equirectangular textures for the sphere. This
+					looked great, but I learned that the p5 sphere generator has a resolution limit that is quite low.
+					Instead I used a hi-rez iso sphere from blemder to get better detail from the height map.
 				</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Integrate</h2>
-				<p> Next I tried integrating the js 2d fft library from <a
-						href="https://github.com/turbomaze/JS-Fourier-Image-Analysis">turbomaze</a>, and got a proof of
-					concept going, but unfortunately the computational cost in javascript was too high, and the
-					framerate became really bad</p>
+				<p> Combining the Texture displacement with the sinwave based displacement gave an interesting effect.
+					By modulating the sin waves based on the terrain of the globe, moutanous regions become more active,
+					while the sea became smooth.</p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Innovate</h2>
-				<p>To get the vizualization running at a live framerate, I switched to writing the code in
-					rust and running it using webassembly. The result was very fast and allowed me to finally test the
-					end-to end process from microphone through canvas to pixels to inverse 2d FFT to final image output.
-					The resulting
-					pattern was interesting, slowly shifting and gaining detail like a living soup, but in the end not
-					very
-					beautiful to a human, especially since I only had one input for both the frequency and phase
-					domains. Instead I switched to using the fourier transform of two images and transisitoned between
-					them using the green intensity of microphone vizualization. Finally I re-applied the colored audio
-					vizualizer to help vizually see where the fft image was
-					being updated.</p>
-
+				<p>At somepoint I was trying to find ways of mathematically separating areas of the map within the
+					vertex shader (while avoiding costly if
+					statements). One of the optimizations I tried was using the reverse calculated position
+					of each point in the fragment shader to selectively render pixels behind a certain depth. This gave
+					the apperance of a hollowed out earth or blob like shapes, vaugely reminicient of landmasses
+					(depending on where the cuttof was).
+					I liked the look, so I tweeked the depth masks and added a slight depth gradient at the edges, to
+					make it look as if the
+					blobs of earth are emerging from a black soup or mist. </p>
 			</div>
 
 			<div class="minor-section">
 				<h2>Reflection</h2>
-				<p>This project was more of personal voyage through many technically challenging topics. As with many
-					explorations, the original intent was to find something really unique and interesting, but I
-					ultimately came up short. Though the result is interesting, the 2d inverse FFT never produced
-					patterns that were very humanly pleasing at a rate fast enough for apreciation. Only by sitting back
-					and watching, could I get lost in the s. Switching to known images partially solves this as it gives
-					viewers something inmediately recongnizable to start to grasp.
+				<p>I enjoyed the aesthetics of this challenge more than the last. Since I had some experience with
+					shader writing it was easier to get closer to the results I wanted than with the previous
+					experiments, although still challenging and frustrating at times.
 				</p>
 			</div>
 
