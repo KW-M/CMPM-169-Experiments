@@ -53,12 +53,21 @@ function addResponseBox() {
 }
 
 function listQuestionButtons(title) {
+    let buttons = [];
     currentAvailableQuestions.forEach((bText, i) => {
-        addButton(bText, () => {
+        const b = addButton(bText, () => {
             currentAvailableQuestions.splice(i, 1);
             const p = addResponseBox()
             handleAiCompletionRequest(p, title + "\n" + currentTraceryText + "\n" + bText, title)
+            buttons.forEach((button) => {
+                button.setAttribute("disabled", "true");
+            })
+            b.classList.add("selected-btn");
+            b.setAttribute("disabled", "false");
+
+            console.log(buttons, b)
         })
+        buttons.push(b)
     })
 }
 
@@ -100,38 +109,5 @@ function regenTraceryText() {
 
 // setup() function is called once when the program starts
 function setup() {
-    // place our canvas, making it fit our container
-    // canvasContainer = $("#canvas-container");
-    // let canvas = createCanvas(canvasContainer.width(), canvasContainer.height());
-    // canvas.parent("canvas-container");
-    // // resize canvas is the page is resized
-    // $(window).on("resize", function () {
-    //     console.log("Resizing...");
-    //     resizeCanvas(canvasContainer.width(), canvasContainer.height());
-    // });
-
-    // var centerHorz = windowWidth / 2;
-    // var centerVert = windowHeight / 2;
     regenTraceryText()
-}
-
-// draw() function is called repeatedly, it's the main animation loop
-function draw() {
-    background(220);
-
-    // Put drawings here
-    var centerHorz = canvasContainer.width() / 2 - 125;
-    var centerVert = canvasContainer.height() / 2 - 125;
-    fill(234, 31, 81);
-    noStroke();
-    rect(centerHorz, centerVert, 250, 250);
-    fill(255);
-    textStyle(BOLD);
-    textSize(140);
-    text("p5*", centerHorz + 10, centerVert + 200);
-}
-
-// mousePressed() function is called once after every time a mouse button is pressed
-function mousePressed() {
-    // code to run when mouse is pressed
 }
