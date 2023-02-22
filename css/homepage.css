@@ -2,14 +2,6 @@
   text-align: center;
 }
 
-#content {
-  border-radius: 20px;
-}
-
-#content .minor-section {
-  border-radius: 20px;
-}
-
 .cat-photo {
   float: left;
   margin: 10px;
