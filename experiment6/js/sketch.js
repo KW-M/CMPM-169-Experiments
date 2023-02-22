@@ -7,6 +7,7 @@ let canvasContainer;
 const grammar = tracery.createGrammar(window.g);
 const instructionsAreaElem = document.getElementById("assembly-instruction-area")
 const instructionsTitleElem = document.getElementById("assembly-title")
+const instructionsContainerElem = document.getElementById("canvas-container")
 let currentTraceryText = "";
 let possibleQuestions = ["What is this?", "How does it work?", "How do I use it?", "What are the common uses of this equipment?", "Explain the physics behind this."]
 let currentAvailableQuestions = possibleQuestions;
@@ -62,10 +63,10 @@ function listQuestionButtons(title) {
 }
 
 function scrollInstructionsArea() {
-    instructionsAreaElem.scrollBy({
+    instructionsContainerElem.scrollTo({
         behavior: "smooth",
         left: 0,
-        top: 999999,
+        top: instructionsContainerElem.scrollHeight,
     })
 }
 
@@ -74,7 +75,7 @@ const loadingPartA = ["Loading ", "Checking ", "Thinking about ", "Reasoning abo
 const loadingPartB = ["tables", "theories", "tools", "ideas", "concepts", "plans", "cube"]
 
 function handleAiCompletionRequest(p, prompt, title) {
-    scrollInstructionsArea()
+    setTimeout(scrollInstructionsArea, 1);
     p.innerHTML = "Understanding request...";
     let i = setInterval(() => p.innerHTML = random(loadingPartA) + random(loadingPartB) + "...", 1000);
     getAiText(prompt).then((response) => {
@@ -82,7 +83,7 @@ function handleAiCompletionRequest(p, prompt, title) {
         p.innerHTML = response;
         console.info("prompt: ", prompt, "response: ", response)
         listQuestionButtons(title);
-        scrollInstructionsArea();
+        setTimeout(scrollInstructionsArea, 1);
     })
 }
 
