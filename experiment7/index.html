@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<!-- This title is used for tabs and bookmarks -->
+	<title>Experiment 5 - Plastic Where!?</title>
+
+	<!-- Use UTF character set, a good idea with any webpage -->
+	<meta charset="UTF-8" />
+	<!-- Set viewport so page remains consistently scaled w narrow devices -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<!-- Include CSS file, including a site-wide CSS and for this particular page -->
+	<link rel="stylesheet" type="text/css" href="../css/site.css">
+
+
+	<!-- Load jQuery library -->
+	<script src="../js/jquery-3.6.3.min.js"></script>
+	<!-- Load p5.js library -->
+	<script src="../js/p5.min.js"></script>
+	<script src="../js/p5.sound.min.js"></script>
+
+
+	<!-- Link to javascript files - DEFER waits until all elements are rendered -->
+	<!-- Use me for a p5.js project -->
+	<script type="text/javascript" src="./js/sketch.js" DEFER></script>
+	<script type="text/javascript" src="../js/page.js" DEFER></script>
+</head>
+
+<body>
+	<!-- Style this page by changing the CSS in ../css/site.css or css/experiment.css -->
+	<div id="canvas-container">
+		<!-- canvas will be added here -->
+		<button id="scroll-page-btn">i</button>
+	</div>
+	<main id="content">
+		<section>
+			<h1>Experiment 5 - Plastic Where!?</h1>
+			<p>
+				In this experiment I vizualized the <a href="https://www.ncei.noaa.gov/products/microplastics">NOAA
+					marine microplastics concentation dataset </a> on a virtual globe.
+				The pink dots scattered over the globe reflect the relative concentration of microplastics found in our
+				ocean. What's really interesting is how you can see where these microplastics get caught in swirling
+				ocean currents, creating zones of high concentation in areas far away from population centers. Areas
+				like nort-eastern canada have lots of microplastics, despite almost no plastic being generated nearby.
+
+			</p>
+			<div class=" minor-section">
+				<h2>Imitate</h2>
+				<p>In this experiment I vizualized the NOAA marine microplastics concentation dataset on an interactive
+					globe.
+					The challenge here was less in the coding and more in how to get from a csv file of points and
+					measurements to a nice looking map. The end result is
+				</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Integrate</h2>
+
+				<p> I took the weather data into ArcGIS online & ran interpolation over the dataset to get a shaded
+					vector map. Then I used the point density vizualization to more cleanly express the relative density
+					of microplastics arround the ocean</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Innovate</h2>
+				<p>After getting the higrez map looking nice, I combined it with the blue marble global imagery from
+					NASA in photoshop and tweeked the colors. I used the sphere renederer from experiment 5, but turned
+					it inside out and improved the mouse controlls. Finally I paired the texture with some homemade
+					twinkle effects in the fragment shader to give it some life.</p>
+			</div>
+
+			<div class="minor-section">
+				<h2>Reflection</h2>
+				<p>My original goal was to use noaa weather data to show wave heights as a displacement map across the
+					globe. However it proved to be difficult to get updated swell data in a format that was machine
+					readable and easy to turn into a height map. Perhaps the most frustrating parts of this challenge
+					were dealing with dataset differences & geographic projection misaligninments.
+				</p>
+			</div>
+
+
+		</section>
+		<nav id="links">
+			<a href="../">Home</a>
+		</nav>
+	</main>
+</body>
+
+</html>
