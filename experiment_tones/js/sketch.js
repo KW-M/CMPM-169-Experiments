@@ -12,7 +12,7 @@ const SHAPE_SIZE_TO_LOUDNESS_RATIO = 0.01;
 // Globals
 let ShapeTones = [];
 let canvasContainer;
-let shapeType = 0;
+let shapeType = -1;
 
 const getPureTone = (waveformType, frequency, volume) => {
     const s = new p5.Oscillator()
